@@ -1,6 +1,7 @@
 from collections import defaultdict
 from multiprocessing import Pool, cpu_count
 from time import perf_counter
+import csv
 
 class Mapreduce:
     def __init__(self,workers = None):
@@ -86,180 +87,31 @@ class Mapreduce:
         mutuals = self.mutual_friends.get((a,b),[])
         return mutuals
         
-         
+def load_friend_list ():
+    friend_list = defaultdict(list)
 
-friend_list={
-    "Alice": [
-        "Ben",
-        "Carol",
-        "Cleo",
-        "Ivan",
-        "Karl",
-        "Nina",
-        "Uma"
-    ],
-    "Bob": [
-        "Oscar",
-        "Rita",
-        "Tara"
-    ],
-    "Carol": [
-        "Alice",
-        "Nina"
-    ],
-    "Dave": [
-        "Amy",
-        "Ivan",
-        "Judy",
-        "Karl",
-        "Oscar",
-        "Uma"
-    ],
-    "Eve": [
-        "Amy",
-        "Drew",
-        "Tara",
-        "Victor"
-    ],
-    "Frank": [
-        "Heidi"
-    ],
-    "Grace": [
-        "Ivan",
-        "Nina",
-        "Yara"
-    ],
-    "Heidi": [
-        "Frank",
-        "Judy",
-        "Xander"
-    ],
-    "Ivan": [
-        "Alice",
-        "Dave",
-        "Drew",
-        "Grace",
-        "Mia"
-    ],
-    "Judy": [
-        "Dave",
-        "Heidi",
-        "Paul",
-        "Uma"
-    ],
-    "Karl": [
-        "Alice",
-        "Dave",
-        "Sam",
-        "Wendy"
-    ],
-    "Liam": [
-        "Rita",
-        "Xander",
-        "Yara"
-    ],
-    "Mia": [
-        "Cleo",
-        "Drew",
-        "Ivan",
-        "Sam",
-        "Victor"
-    ],
-    "Nina": [
-        "Alice",
-        "Carol",
-        "Cleo",
-        "Grace"
-    ],
-    "Oscar": [
-        "Bob",
-        "Dave",
-        "Yara"
-    ],
-    "Paul": [
-        "Cleo",
-        "Judy",
-        "Tara"
-    ],
-    "Quinn": [
-        "Amy"
-    ],
-    "Rita": [
-        "Bob",
-        "Drew",
-        "Liam",
-        "Tara"
-    ],
-    "Sam": [
-        "Karl",
-        "Mia",
-        "Zane"
-    ],
-    "Tara": [
-        "Bob",
-        "Eve",
-        "Paul",
-        "Rita"
-    ],
-    "Uma": [
-        "Alice",
-        "Dave",
-        "Judy",
-        "Zane"
-    ],
-    "Victor": [
-        "Drew",
-        "Eve",
-        "Mia"
-    ],
-    "Wendy": [
-        "Karl"
-    ],
-    "Xander": [
-        "Drew",
-        "Heidi",
-        "Liam",
-        "Zane"
-    ],
-    "Yara": [
-        "Grace",
-        "Liam",
-        "Oscar"
-    ],
-    "Zane": [
-        "Cleo",
-        "Sam",
-        "Uma",
-        "Xander"
-    ],
-    "Amy": [
-        "Cleo",
-        "Dave",
-        "Eve",
-        "Quinn"
-    ],
-    "Ben": [
-        "Alice"
-    ],
-    "Cleo": [
-        "Alice",
-        "Amy",
-        "Mia",
-        "Nina",
-        "Paul",
-        "Zane"
-    ],
-    "Drew": [
-        "Eve",
-        "Ivan",
-        "Mia",
-        "Rita",
-        "Victor",
-        "Xander"
-    ]
-    }
+    with open("facebook_friends_sample.csv", mode = "r", newline="", encoding= "utf-8") as file:
+        reader = csv.DictReader(file)
+
+        if reader.fieldnames != ["person","friend"]:
+            raise ValueError(
+            "CSV must have exactly these headers: person,friend"
+        )
+
+        for row in reader:
+            person = row["person"].strip()
+            friend = row["friend"].strip()
+
+            if not person or not friend:
+                continue
+
+            friend_list[person].append(friend)
+
+    return dict(friend_list)
 
 if __name__ == "__main__":
+    friend_list = load_friend_list()
+
     start_time = perf_counter()
 
     m = Mapreduce(1)
