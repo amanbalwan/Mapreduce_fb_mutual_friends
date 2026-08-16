@@ -1,10 +1,11 @@
 from collections import defaultdict
 from multiprocessing import Pool, cpu_count
+from time import perf_counter
 
 class Mapreduce:
-    def __init__(self):
+    def __init__(self,workers = None):
         self.friend_list = friend_list
-        self.mutual_friends = self.run_map_reduce(self.friend_list)
+        self.mutual_friends = self.run_map_reduce(self.friend_list, workers)
 
     def chunk_dict(self,data, n_chunks):
         items = list(data.items())
@@ -259,8 +260,23 @@ friend_list={
     }
 
 if __name__ == "__main__":
+    start_time = perf_counter()
 
-    m = Mapreduce()
+    m = Mapreduce(1)
+
+    end_time = perf_counter()
+
+    print(f"MapReduce build time(Single-core): {end_time - start_time:.6f} seconds")
+
+    start_time = perf_counter()
+    
+    m_multi = Mapreduce()
+
+    end_time = perf_counter()
+
+    print(f"MapReduce build time (Multi-processing): {end_time - start_time:.6f} seconds")
+    
+
 
     while True:
         person = input("Enter two friends: ")
